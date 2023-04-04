@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5434/fitness
+    username: postgres
+    password: kasper
+  jackson:
+    date-format: "yyyy-MM-dd HH:mm:ss.SSS"
+    time-zone: "GMT+3"
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    database: postgresql
