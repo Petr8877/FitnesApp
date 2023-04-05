@@ -1,6 +1,6 @@
 package SingVersion.FitnesApp.web.controller.user;
 
-import io.restassured.http.ContentType;
+import SingVersion.FitnesApp.restAssured.Specification;
 import org.junit.jupiter.api.Test;
 
 
@@ -8,24 +8,6 @@ import static io.restassured.RestAssured.given;
 
 class UsersControllerTest {
 
-    private static final String token;
-
-    static {
-        String authReq = """
-                {
-                    "email": "admin@gmail.com",
-                    "password": "string"
-                }""";
-
-        token = "Bearer " + given()
-                .when()
-                .contentType(ContentType.JSON)
-                .body(authReq)
-                .post("http://localhost:8080/users/login")
-                .then()
-                .statusCode(200)
-                .extract().asString();
-    }
 
     @Test
     void addNewUser() {
@@ -38,36 +20,38 @@ class UsersControllerTest {
                   "password": "string"
                 }""";
 
+        Specification.installSpecification(
+                Specification.requestSpecification(createReq), Specification.responseSpecification200()
+        );
+
         given()
                 .when()
-                .contentType(ContentType.JSON)
-                .header("Authorization", token)
-                .body(createReq)
-                .post("http://localhost:8080/users")
-                .then()
-                .statusCode(200);
+                .post("users")
+                .then();
     }
 
     @Test
     void getUsersPage() {
+        Specification.installSpecification(
+                Specification.requestSpecification(), Specification.responseSpecification200()
+        );
+
         given()
                 .when()
-                .contentType(ContentType.JSON)
-                .header("Authorization", token)
-                .get("http://localhost:8080/users")
-                .then()
-                .statusCode(200);
+                .get("users")
+                .then();
     }
 
     @Test
     void getUserById() {
+        Specification.installSpecification(
+                Specification.requestSpecification(), Specification.responseSpecification200()
+        );
+
         given()
                 .when()
-                .contentType(ContentType.JSON)
-                .header("Authorization", token)
-                .get("http://localhost:8080/users/8ef84e6d-e12b-4590-a829-a9548d5e11b5")
-                .then()
-                .statusCode(200);
+                .get("users/8ef84e6d-e12b-4590-a829-a9548d5e11b5")
+                .then();
     }
 
     @Test
@@ -81,22 +65,19 @@ class UsersControllerTest {
                   "password": "string"
                 }""";
 
+        Specification.installSpecification(
+                Specification.requestSpecification(changeBody), Specification.responseSpecification200()
+        );
+
         String version = given()
                 .when()
-                .contentType(ContentType.JSON)
-                .header("Authorization", token)
-                .get("http://localhost:8080/users/8ef84e6d-e12b-4590-a829-a9548d5e11b5")
+                .get("users/8ef84e6d-e12b-4590-a829-a9548d5e11b5")
                 .then()
-                .statusCode(200)
                 .extract().jsonPath().getString("dt_update");
 
         given()
                 .when()
-                .contentType(ContentType.JSON)
-                .header("Authorization", token)
-                .body(changeBody)
-                .put("http://localhost:8080/users/8ef84e6d-e12b-4590-a829-a9548d5e11b5/dt_update/" + version)
-                .then()
-                .statusCode(200);
+                .put("users/8ef84e6d-e12b-4590-a829-a9548d5e11b5/dt_update/" + version)
+                .then();
     }
 }

@@ -1,7 +1,7 @@
 package SingVersion.FitnesApp.web.controller.product;
 
 import SingVersion.FitnesApp.core.dto.product.SaveRecipeDto;
-import io.restassured.http.ContentType;
+import SingVersion.FitnesApp.restAssured.Specification;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -10,24 +10,6 @@ import static io.restassured.RestAssured.given;
 
 class RecipeControllerTest {
 
-    private static final String token;
-
-    static {
-        String authReq = """
-                {
-                    "email": "admin@gmail.com",
-                    "password": "string"
-                }""";
-
-        token = "Bearer " + given()
-                .when()
-                .contentType(ContentType.JSON)
-                .body(authReq)
-                .post("http://localhost:8080/users/login")
-                .then()
-                .statusCode(200)
-                .extract().asString();
-    }
 
     @Test
     void addRecipe() {
@@ -46,26 +28,26 @@ class RecipeControllerTest {
                   ]
                 }""".formatted("recipe" + Math.random() * 100);
 
+        Specification.installSpecification(
+                Specification.requestSpecification(recipeBody), Specification.responseSpecification200()
+        );
 
         given()
                 .when()
-                .contentType(ContentType.JSON)
-                .header("Authorization", token)
-                .body(recipeBody)
-                .post("http://localhost:8080/recipe")
-                .then()
-                .statusCode(200);
+                .post("recipe")
+                .then();
     }
 
     @Test
     void getRecipePage() {
+        Specification.installSpecification(
+                Specification.requestSpecification(), Specification.responseSpecification200()
+        );
+
         given()
                 .when()
-                .contentType(ContentType.JSON)
-                .header("Authorization", token)
-                .get("http://localhost:8080/recipe")
-                .then()
-                .statusCode(200);
+                .get("recipe")
+                .then();
     }
 
     @Test
@@ -85,11 +67,13 @@ class RecipeControllerTest {
                   ]
                 }""".formatted("Гречка с лисичками" + Math.random() * 100);
 
+        Specification.installSpecification(
+                Specification.requestSpecification(changeBody), Specification.responseSpecification200()
+        );
+
         List<SaveRecipeDto> list = given()
                 .when()
-                .contentType(ContentType.JSON)
-                .header("Authorization", token)
-                .get("http://localhost:8080/recipe")
+                .get("recipe")
                 .then()
                 .extract().body().jsonPath().getList("content", SaveRecipeDto.class);
 
@@ -98,11 +82,7 @@ class RecipeControllerTest {
 
         given()
                 .when()
-                .contentType(ContentType.JSON)
-                .header("Authorization", token)
-                .body(changeBody)
-                .put("http://localhost:8080/recipe/" + recipeUUID + "/dt_update/" + recipeVersion)
-                .then().log().all()
-                .statusCode(200);
+                .put("recipe/" + recipeUUID + "/dt_update/" + recipeVersion)
+                .then();
     }
 }

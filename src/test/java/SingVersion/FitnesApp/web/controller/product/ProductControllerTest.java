@@ -1,7 +1,7 @@
 package SingVersion.FitnesApp.web.controller.product;
 
 import SingVersion.FitnesApp.core.dto.product.SaveProductDto;
-import io.restassured.http.ContentType;
+import SingVersion.FitnesApp.restAssured.Specification;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -10,24 +10,6 @@ import static io.restassured.RestAssured.given;
 
 class ProductControllerTest {
 
-    private static final String token;
-
-    static {
-        String authReq = """
-                {
-                    "email": "admin@gmail.com",
-                    "password": "string"
-                }""";
-
-        token = "Bearer " + given()
-                .when()
-                .contentType(ContentType.JSON)
-                .body(authReq)
-                .post("http://localhost:8080/users/login")
-                .then()
-                .statusCode(200)
-                .extract().asString();
-    }
 
     @Test
     void addProduct() {
@@ -41,14 +23,14 @@ class ProductControllerTest {
                   "carbohydrates": 70.1
                 }""".formatted("product" + Math.random() * 100);
 
+        Specification.installSpecification(
+                Specification.requestSpecification(productBody), Specification.responseSpecification200()
+        );
+
         given()
                 .when()
-                .contentType(ContentType.JSON)
-                .header("Authorization", token)
-                .body(productBody)
-                .post("http://localhost:8080/product")
-                .then()
-                .statusCode(200);
+                .post("product")
+                .then();
     }
 
     @Test
@@ -63,11 +45,13 @@ class ProductControllerTest {
                   "carbohydrates": 57.1
                 }""".formatted("new product" + Math.random() * 100);
 
+        Specification.installSpecification(
+                Specification.requestSpecification(updateProduct), Specification.responseSpecification200()
+        );
+
         List<SaveProductDto> productList = given()
                 .when()
-                .contentType(ContentType.JSON)
-                .header("Authorization", token)
-                .get("http://localhost:8080/product")
+                .get("product")
                 .then()
                 .extract().body().jsonPath().getList("content", SaveProductDto.class);
 
@@ -76,22 +60,15 @@ class ProductControllerTest {
 
         given()
                 .when()
-                .contentType(ContentType.JSON)
-                .header("Authorization", token)
-                .body(updateProduct)
-                .put("http://localhost:8080/product/" + productUUID + "/dt_update/" + productVersion)
-                .then()
-                .statusCode(200);
+                .put("product/" + productUUID + "/dt_update/" + productVersion)
+                .then();
     }
 
     @Test
     void getProductPage() {
         given()
                 .when()
-                .contentType(ContentType.JSON)
-                .header("Authorization", token)
-                .get("http://localhost:8080/product")
-                .then()
-                .statusCode(200);
+                .get("product")
+                .then();
     }
 }
