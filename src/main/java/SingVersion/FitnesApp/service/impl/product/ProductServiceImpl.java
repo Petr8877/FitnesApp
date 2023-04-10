@@ -42,13 +42,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public Product addProduct(ProductDto productDTO) {
+    public SaveProductDto addProduct(ProductDto productDTO) {
         if (!repository.existsByTitle(productDTO.getTitle())) {
             Product product = repository.save(
                     Objects.requireNonNull(conversionService.convert(productDTO, Product.class))
             );
             toAudit("Создание нового продукта uuid:" + product.getUuid());
-            return product;
+            return conversionService.convert(product, SaveProductDto.class);
         } else {
             throw new SingleErrorResponse("Продукт с таким наименованием уже существует");
         }
@@ -56,7 +56,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public Product updateProduct(UUID uuid, LocalDateTime dtUpdate, ProductDto productDTO) {
+    public SaveProductDto updateProduct(UUID uuid, LocalDateTime dtUpdate, ProductDto productDTO) {
         Product productById = repository.findById(uuid).orElseThrow(()
                 -> new SingleErrorResponse("Продукта с таким ид не существует"));
         if (Objects.equals(dtUpdate, productById.getDtUpdate())) {
@@ -67,7 +67,7 @@ public class ProductServiceImpl implements ProductService {
             productById.setFats(productDTO.getFats());
             productById.setCarbohydrates(productDTO.getCarbohydrates());
             toAudit("Изменение продукта uuid:" + productById.getUuid());
-            return repository.save(productById);
+            return conversionService.convert(repository.save(productById), SaveProductDto.class);
         } else {
             throw new SingleErrorResponse("Не верная версия");
         }

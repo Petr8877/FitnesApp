@@ -9,7 +9,7 @@ import SingVersion.FitnesApp.entity.User;
 
 public interface RegistrationUserService {
 
-    User registrationUser(RegistrationDto userRegistrationDTO);
+    SaveUserDto registrationUser(RegistrationDto userRegistrationDTO);
 
     boolean verification(String code, String email);
 

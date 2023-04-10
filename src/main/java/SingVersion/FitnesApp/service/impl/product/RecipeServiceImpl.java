@@ -4,6 +4,7 @@ import SingVersion.FitnesApp.core.dto.DetailsDto;
 import SingVersion.FitnesApp.core.dto.PageDto;
 import SingVersion.FitnesApp.core.dto.audit.CreateEntryDto;
 import SingVersion.FitnesApp.core.dto.product.*;
+import SingVersion.FitnesApp.core.dto.user.SaveUserDto;
 import SingVersion.FitnesApp.core.exception.SingleErrorResponse;
 import SingVersion.FitnesApp.entity.Ingredient;
 import SingVersion.FitnesApp.entity.Product;
@@ -45,13 +46,13 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     @Transactional
-    public Recipe createRecipe(RecipeDto recipeDTO) {
+    public SaveRecipeDto createRecipe(RecipeDto recipeDTO) {
         if (!recipeRepository.existsByTitle(recipeDTO.title())) {
             Recipe recipe = recipeRepository.save(
                     Objects.requireNonNull(conversionService.convert(recipeDTO, Recipe.class))
             );
             toAudit("Создание нового рецепта uuid:" + recipe.getUuid());
-            return recipe;
+            return conversionService.convert(recipe, SaveRecipeDto.class);
         } else {
             throw new SingleErrorResponse("Рецепт с таким названием уже существует");
         }
@@ -78,7 +79,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     @Transactional
-    public Recipe updateRecipe(UUID uuid, LocalDateTime dtUpdate, RecipeDto recipeDTO) {
+    public SaveRecipeDto updateRecipe(UUID uuid, LocalDateTime dtUpdate, RecipeDto recipeDTO) {
         Recipe recipeById = recipeRepository.findById(uuid).orElseThrow(()
                 -> new SingleErrorResponse("Продукта с таким ид не существует"));
         if (Objects.equals(dtUpdate, recipeById.getDtUpdate())) {
@@ -89,7 +90,7 @@ public class RecipeServiceImpl implements RecipeService {
             recipeById.setTitle(recipeDTO.title());
             recipeById.setIngredients(ingredients);
             toAudit("Изменение рецепта uuid:" + recipeById.getUuid());
-            return recipeRepository.save(recipeById);
+            return conversionService.convert(recipeRepository.save(recipeById), SaveRecipeDto.class);
         } else {
             throw new SingleErrorResponse("Не верная версия");
         }

@@ -11,11 +11,11 @@ import java.util.UUID;
 
 public interface UsersService {
 
-    User createUser(UserDto userDTO);
+    SaveUserDto createUser(UserDto userDTO);
 
     SaveUserDto getUser(UUID id);
 
-    User updateUser(UUID id, LocalDateTime dtUpdate, UserDto userDTO);
+    SaveUserDto updateUser(UUID id, LocalDateTime dtUpdate, UserDto userDTO);
 
     PageDto<SaveUserDto> getUsersPage(Pageable pageable);
 }

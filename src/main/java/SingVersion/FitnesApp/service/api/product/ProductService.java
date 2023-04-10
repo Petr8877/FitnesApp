@@ -11,9 +11,9 @@ import java.util.UUID;
 
 public interface ProductService {
 
-    Product addProduct(ProductDto productDTO);
+    SaveProductDto addProduct(ProductDto productDTO);
 
-    Product updateProduct(UUID uuid, LocalDateTime dtUpdate, ProductDto productDTO);
+    SaveProductDto updateProduct(UUID uuid, LocalDateTime dtUpdate, ProductDto productDTO);
 
     PageDto<SaveProductDto> getProductPage(Pageable pageable);
 }

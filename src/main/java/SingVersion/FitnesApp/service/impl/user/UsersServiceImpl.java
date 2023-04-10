@@ -44,11 +44,11 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     @Transactional
-    public User createUser(@Validated UserDto userDTO) {
+    public SaveUserDto createUser(@Validated UserDto userDTO) {
         User user = conversionService.convert(userDTO, User.class);
         userRepository.save(Objects.requireNonNull(user));
         toAudit("Создание новогопользователя uuid: " + user.getUuid());
-        return user;
+        return conversionService.convert(user, SaveUserDto.class);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     @Transactional
-    public User updateUser(UUID id, LocalDateTime dtUpdate, UserDto userDTO) {
+    public SaveUserDto updateUser(UUID id, LocalDateTime dtUpdate, UserDto userDTO) {
         User entity = userRepository.findById(id).orElseThrow(() ->
                 new SingleErrorResponse("Нет пользователя для обновления с таким id"));
         if (Objects.equals(entity.getDtUpdate(), dtUpdate)) {
@@ -76,7 +76,7 @@ public class UsersServiceImpl implements UsersService {
             entity.setStatus(userDTO.status());
             entity.setPassword(encoder.encode(userDTO.password()));
             toAudit("Корректировка информации о пользователе uuid: " + entity.getUuid());
-            return userRepository.save(entity);
+            return conversionService.convert(userRepository.save(entity), SaveUserDto.class);
         } else {
             throw new SingleErrorResponse("Введена не верная версия");
         }

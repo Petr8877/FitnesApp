@@ -11,9 +11,9 @@ import java.util.UUID;
 
 public interface RecipeService {
 
-    Recipe createRecipe(RecipeDto recipeDTO);
+    SaveRecipeDto createRecipe(RecipeDto recipeDTO);
 
     PageDto<SaveRecipeDto> getRecipePage(Pageable pageable);
 
-    Recipe updateRecipe(UUID uuid, LocalDateTime dtUpdate, RecipeDto recipeDTO);
+    SaveRecipeDto updateRecipe(UUID uuid, LocalDateTime dtUpdate, RecipeDto recipeDTO);
 }

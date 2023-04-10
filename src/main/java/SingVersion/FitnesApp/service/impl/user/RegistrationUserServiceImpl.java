@@ -51,7 +51,7 @@ public class RegistrationUserServiceImpl implements RegistrationUserService {
 
     @Override
     @Transactional
-    public User registrationUser(RegistrationDto registrationDTO) {
+    public SaveUserDto registrationUser(RegistrationDto registrationDTO) {
         if (!repository.existsByEmail(registrationDTO.email())) {
             User user = conversionService.convert(registrationDTO, User.class);
             User save = repository.save(user);
@@ -59,7 +59,7 @@ public class RegistrationUserServiceImpl implements RegistrationUserService {
             executorService.submit(new Thread(() ->
                     emailService.sendSimpleMessage(save.getEmail(), createLink(save.getEmail(), save.getUuid()))));
 //            emailService.sendSimpleMessage(save.getEmail(), createLink(save.getEmail(), save.getUuid()));
-            return save;
+            return conversionService.convert(user, SaveUserDto.class);
         } else {
             throw new SingleErrorResponse("Данная почта уже была использована для регистрации");
         }
